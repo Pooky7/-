@@ -1,0 +1,19 @@
+import matplotlib.pyplot as plt
+import numpy as up
+x=0
+y=1
+a=[]
+b=[]
+steps=10
+for n in range(steps):
+    y = 1.1 * y - 0.2 * x / y
+    x+=0.1
+    a.append(x)
+    b.append(y)
+print(a)
+print(b)
+fig = plt.figure()#生成窗口
+#plt.plot(b,a)
+ax = fig.add_subplot()#线性函数
+ax.plot(a,b)
+plt.show()

@@ -1,0 +1,23 @@
+import random
+data1 = [5,6,7,8,9,10,11,12]
+data2 = [6,7,8,9,10,11,12,13]
+h = 0.01
+a = 0.01
+def Pooky(theta0,theta1,x):
+    return theta0+theta1*x
+theta0=0
+theta1=0
+theta00 = 100.
+theta11 = 100.
+m=1000
+for n in range(m):
+    theta00 = theta0
+    theta11 = theta1
+    i = random.randint(0,4)
+    theta0 = theta0 - a*(data1[i]-data2[i])
+    theta1 = theta1 - a*(data1[i]-data2[i])*data1[i]
+    if(theta0-theta00) <= h \
+            or (theta1-theta11) <= h:
+        print(theta0)
+        print(theta1)
+        break

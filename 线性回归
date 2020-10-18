@@ -1,0 +1,38 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = [2104,1600,2400,1416,3000]
+x = np.reshape(x,newshape=(5,1))/1000
+y = [400, 300, 369, 232, 540]
+y = np.reshape(y,newshape=(5,1))/100
+plt.scatter(x,y)
+def model(a,b,x) :
+    return a+b*x
+def cost_function(a,b,x,y):
+    n = 5
+    return 0.5/n*(a+b*x-y)*(a+b+x-y).sum()
+def pd(a,b,x,y):
+    c = 0.01
+    n = 5
+    y1 = model(a,b,x)
+    d1 = (1/n)*((y1-y).sum())
+    d2 = (1/n)*((y1-y)*x).sum()
+    a = a-c*d1
+    b = b-c*d2
+    return a, b
+a = 0
+b = 0
+def syz(a,b,x,y,t):
+    for i in range(t):
+        a,b = pd(a,b,x,y)
+
+    y1= model(a,b,x)
+    y2= cost_function(a,b,x,y)
+    cost = cost_function(a,b,x,y)
+    print(a,b,cost)
+    plt.plot(x, y1)
+    plt.scatter(x, y)
+    plt.plot(x, y2)
+    return a, b
+a,b = syz(a, b, x, y, 5000)
+plt.show()

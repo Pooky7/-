@@ -1,0 +1,26 @@
+import random
+import math
+import matplotlib.pyplot as plt
+from scipy import stats
+
+p_x = []
+p_y = []
+a = 1
+power = 4
+t = 0.4
+sum_ = (math.pow(1-t, power + 1) - math.pow(-t, power + 1)) / (power + 1)
+k = 0.6**4/sum_
+
+def f(x):
+    return (x - 0.4)**4/sum_
+def kg(x):
+    return k * stats.norm(0, 2.5).pdf(x)
+for i in range(1000):
+    x = random.uniform(0, 1)
+    y = 8*random.uniform(0, 1)
+    if y * kg(x) <= f(x):
+        p_x.append(x)
+        p_y.append(y)
+fig = plt.figure(1)
+plt.scatter(p_x, p_y)
+plt.show()

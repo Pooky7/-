@@ -1,0 +1,610 @@
+#include<stdio.h>
+#include<string.h>
+#define CRYPT_OK 1
+#define CRYPT_ERROR 0
+#define MAXSIZE 100
+
+void ShiftCipher();
+void VigenereCipher();
+void CycleCipher();
+void ColCipher();
+
+
+void main()
+{
+	int op=0;
+	while(1)
+	{
+		printf("Which Cipher would you want ?:1.Shift 2.Vig 3.Cyc 4.Col:\n");
+		scanf("%d",&op);
+		fflush(stdin);
+		switch(op)
+		{
+		case 1:{ShiftCipher();}break;
+		case 2:{VigenereCipher();}break;
+		case 3:{CycleCipher();}break;
+		case 4:{ColCipher();}break;
+		}
+	}
+
+}
+//主函数
+
+//列置换置换密码
+int Colencrypt(char* plain,char* cipher,char* key);	//列置换置换密码加密算法
+int Coldecrypt(char* plain,char* cipher,char* key);	//列置换置换密码解密算法
+void ColCipherEncrypt();								//列置换置换密码加密调用
+void ColCipherDecrypt();								//列置换置换密码解密调用
+void ColCipher();										//列置换置换密码模块调用
+int fix(char* m,int T);									//字符串补齐修正
+
+void ColCipher()
+{
+	int op=0;
+	while(1)
+	{
+		fflush(stdin);
+		printf("__This_is_Coloum_Cipher_Process____________________\n");
+		printf("1 for encrypt，2 for decrypt：");
+		scanf("%d",&op);
+		getchar();
+		switch(op)
+		{
+		case 1:{ColCipherEncrypt();}break;
+		case 2:{ColCipherDecrypt();}break;
+		default:{printf("Error Input\n");}
+		}
+	}
+}
+//列置换置换密码模块调用
+void ColCipherEncrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE],k[MAXSIZE];
+	//定义变量	
+	printf("Please Input the Plaintext:\n");
+	gets(p);
+	fflush(stdin);
+	printf("Please Input the ColKey：(连续整数序列置换)\n");
+	gets(k);
+	//获取明文&密钥
+	fix(p,strlen(k));
+	//补齐空格
+	Colencrypt(p,c,k);
+	//调用加密函数
+	printf("Chipertext:\n%s",c);
+	getchar();
+}
+//列置换置换密码加密调用
+void ColCipherDecrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE],k[MAXSIZE],flag,abc[27];
+	int i,temp;
+	//定义变量	
+	printf("Please Input the Ciphertext:\n");
+	gets(c);
+	printf("Do You Know the Key? y/n:");
+	fflush(stdin);
+	scanf("%c",&flag);
+	getchar();
+
+	switch(flag)
+	{
+	case 'y':	//若知道密钥则直接经行解密
+		{
+			printf("Please Input the ColKey：\n");
+			gets(k);
+			//获取密钥
+			fix(c,strlen(k));
+			Coldecrypt(p,c,k);
+			//调用函数
+			printf("Plaintext:\n%s\n",p);
+		}break;
+
+	case 'n':	//不知道密钥则对文本进行字母统计分析
+		{
+			printf("Then I can't help you!\n");
+		};break;
+
+	default:{printf("ERROR\n");}
+	}
+
+}
+//列置换置换密码解密调用
+int Colencrypt(char* plain,char* cipher,char* key)
+{
+	int i,r,T,n,j;
+	char temp[MAXSIZE];
+	i=0;
+
+	T=strlen(key);
+	while(plain[i]!='\0')
+	{
+		r=i%T;
+		cipher[i]=plain[i-r+(key[r]-'0')-1];
+		i++;
+	}
+	cipher[i]='\0';
+	n=strlen(cipher)/strlen(key);
+
+	for(i=0;i<T;i++)
+	{
+		for(j=0;j<n;j++)
+		{
+			temp[i]=cipher[T*j+i%T];
+		}
+	}
+temp[strlen(cipher)]='\0';
+
+
+	return CRYPT_OK;
+}
+//列置换置换密码加密算法
+int Coldecrypt(char* plain,char* cipher,char* key)
+{
+	int i,r,T,n,j;
+	char temp[MAXSIZE];
+	i=0;
+
+	T=strlen(key);
+	while(cipher[i]!='\0')
+	{
+		r=i%T;
+		plain[i]=cipher[i-r+(key[r]-'0')-1];
+		i++;
+	}
+	plain[i]='\0';
+	n=strlen(plain)/strlen(key);
+
+	for(i=0;i<T;i++)		//
+	{
+		for(j=0;j<n;j++)
+		{
+			temp[i]=plain[T*j+i];
+		}
+	}
+	temp[strlen(plain)]='\0';
+	plain=temp;
+	return CRYPT_OK;
+
+}
+//列置换置换密码解密算法
+
+//移位密码
+int ShiftEncrypt(char* plain,char* cipher,int key);	//移位密码加密算法
+int ShiftDecrypt(char* plain,char* cipher,int key);	//移位密码解密算法
+void ShiftCipherEncrypt();							//移位密码加密调用
+void ShiftCipherDecrypt();							//移位密码解密调用
+void ShiftCipher();									//移位密码模块调用
+
+void ShiftCipher()
+{
+	int op=0;
+	while(1)
+	{
+		fflush(stdin);
+					printf("_This_is_Shift_Cipher_Process_________________________\n");
+		printf("1 for encrypt，2 for decrypt：");
+		scanf("%d",&op);
+		getchar();
+		switch(op)
+		{
+		case 1:{ShiftCipherEncrypt();}break;
+		case 2:{ShiftCipherDecrypt();}break;
+		default:{printf("Error Input\n");}
+		}
+	}
+}
+//移位密码模块调用
+void ShiftCipherEncrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE];
+	int key=0;
+	//定义变量	
+	printf("Please Input the Plaintext:\n");
+	gets(p);
+	printf("Please Input the ShiftKey：\n");
+	scanf("%d",&key);
+	//获取必要信息
+	ShiftEncrypt(p,c,key);
+	//调用函数
+	printf("Chipertext:\n%s\n",c);
+	getchar();
+}
+//移位密码加密调用
+void ShiftCipherDecrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE],flag;
+	int key=0;
+	int i;
+	//定义变量	
+	printf("Please Input the Ciphertext:\n");
+	gets(c);
+	printf("Do You Know the Key? y/n:");
+	fflush(stdin);
+	scanf("%c",&flag);
+	getchar();
+
+	switch(flag)
+	{
+	case 'y':
+		{
+			printf("Please Input the ShiftKey[0-26]：\n");
+			scanf("%d",&key);
+			//获取必要信息
+			ShiftDecrypt(p,c,26-key);
+			//调用函数
+			printf("Plaintext:\n%s\n",p);
+			getchar();
+		}break;
+	case 'n':
+		{
+			for(i=25;i>0;i--)
+			{
+				ShiftDecrypt(p,c,i);
+				printf("Plaintext Shift By %2d is:  %s\n",26-i,p);
+			}
+		};break;
+	default:{printf("ERROR\n");}
+	}
+
+}
+//移位密码解密调用
+int ShiftEncrypt(char* plain,char* cipher,int key)
+{
+	int i=0;
+	while(plain[i]!='\0')
+	{
+		if(plain[i]>='A'&&plain[i]<='Z')
+		{
+			cipher[i]=(plain[i]+key-'A')%26+'A';
+		}
+		else 
+		{
+
+			if(plain[i]>='a'&&plain[i]<='z')
+			{
+				cipher[i]=(plain[i]+key-'a')%26+'a';
+			}
+			else
+				cipher[i]=plain[i];
+		}
+		i++;
+
+	}
+	cipher[i]='\0';
+	return CRYPT_OK;
+}
+//移位密码加密算法
+int ShiftDecrypt(char* plain,char* cipher,int key)
+{
+	int i=0;
+	while(cipher[i]!='\0')
+	{
+		if(cipher[i]>='A'&&cipher[i]<='Z')
+		{
+			plain[i]=(cipher[i]-'A'+key)%26+'A';
+		}
+		else 
+		{
+			if(cipher[i]>='a'&&cipher[i]<='z')
+			{
+				plain[i]=(cipher[i]-'a'+key)%26+'a';
+			}
+			else
+		{plain[i]=cipher[i];}
+		}
+		i++;
+	}
+
+	plain[i]='\0';
+	return CRYPT_OK;
+}
+//移位密码解密算法
+
+
+
+
+//弗吉尼亚密码
+int Vigenereencrypt(char* plain,char* cipher,char* key);	//弗吉尼亚密码加密算法
+int Vigeneredecrypt(char* plain,char* cipher,char* key);	//弗吉尼亚密码解密算法
+void VigenereCipherEncrypt();								//弗吉尼亚密码加密调用
+void VigenereCipherDecrypt();								//弗吉尼亚密码解密调用
+void VigenereCipher();										//弗吉尼亚密码模块调用
+void Static(char* c);										//密文字母频率统计模块
+
+void VigenereCipher()
+{
+	int op=0;
+	while(1)
+	{
+		fflush(stdin);
+		printf("__This_is_Vigenere_Cipher_Process_____________________\n");
+		printf("1 for encrypt，2 for decrypt：");
+		scanf("%d",&op);
+		getchar();
+		switch(op)
+		{
+		case 1:{VigenereCipherEncrypt();}break;
+		case 2:{VigenereCipherDecrypt();}break;
+		default:{printf("Error Input\n");}
+		}
+	}
+}
+//弗吉尼亚密码模块调用
+
+void VigenereCipherEncrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE],k[MAXSIZE];
+	//定义变量	
+	printf("Please Input the Plaintext:\n");
+	gets(p);
+	fflush(stdin);
+	printf("Please Input the VigenereKey：(low case)\n");
+	gets(k);
+	//获取必要信息
+	Vigenereencrypt(p,c,k);
+	//调用函数
+	printf("Chipertext:\n%s",c);
+	getchar();
+}
+//弗吉尼亚密码加密调用
+
+void VigenereCipherDecrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE],k[MAXSIZE],flag,abc[27];
+	int i,temp;
+	//定义变量	
+	printf("Please Input the Ciphertext:\n");
+	gets(c);
+	printf("Do You Know the Key? y/n:");
+	fflush(stdin);
+	scanf("%c",&flag);
+	getchar();
+
+	switch(flag)
+	{
+	case 'y':	//若知道密钥则直接经行解密
+		{
+			printf("Please Input the VigenereKey：\n");
+			gets(k);
+			//获取密钥
+			Vigeneredecrypt(p,c,k);
+			//调用函数
+			printf("Plaintext:\n%s\n",p);
+		}break;
+
+	case 'n':	//不知道密钥则对文本进行字母统计分析
+		{
+			Static(c);
+		};break;
+
+	default:{printf("ERROR\n");}
+	}
+
+}
+//弗吉尼亚密码解密调用
+
+int Vigenereencrypt(char* plain,char* cipher,char* key)
+{
+	int i=0;
+	int T;
+	T=strlen(key);
+	printf("%d",T);
+	while(plain[i]!='\0')
+	{
+		if(plain[i]>='A'&&plain[i]<='Z')
+		{
+			cipher[i]=(plain[i]+key[i%T]-'A'-'a')%26+'A';
+		}
+		else 
+		{
+
+			if(plain[i]>='a'&&plain[i]<='z')
+			{
+				cipher[i]=(plain[i]+key[i%T]-'a'-'a')%26+'a';
+			}
+			else
+				cipher[i]=plain[i];
+		}
+		i++;
+
+	}
+	cipher[i]='\0';
+	return CRYPT_OK;
+}
+//弗吉尼亚密码加密算法
+
+int Vigeneredecrypt(char* plain,char* cipher,char* key)
+{
+	int i=0;
+	int T;
+	int abc[26];
+	T=strlen(key);
+	while(cipher[i]!='\0')
+	{
+		if(cipher[i]>='A'&&cipher[i]<='Z')
+		{
+			plain[i]=(cipher[i]-'A'+26-(key[i%T]-'a'))%26+'A';
+		}
+		else 
+		{
+			if(cipher[i]>='a'&&cipher[i]<='z')
+			{
+				plain[i]=(cipher[i]-'a'+26-(key[i%T]-'a'))%26+'a';
+			}
+			else
+			{plain[i]=cipher[i];}
+		}
+		i++;
+	}
+
+	plain[i]='\0';
+	return CRYPT_OK;
+}
+//弗吉尼亚密码解密算法
+void Static(char* c)
+{
+	int i,temp;
+	int abc[27]={0}; 
+	i=0;
+	temp=0;
+
+	while(c[i]!='\0')
+	{
+		if(c[i]>='A'&&c[i]<='Z')
+		{temp=c[i]-'A';}
+		else
+		{
+			if(c[i]>='a'&&c[i]<='z')
+			{
+				temp=c[i]-'a';
+			}				
+			else
+			{
+				temp=26;
+			}
+		}
+		abc[temp]++;
+		i++;
+	}
+	for(i=0;i<26;i++)
+	{
+		printf("%c:%d\n",i+'A',abc[i]);
+	}
+	printf("Other:%d\n",abc[26]);
+	printf("That's all I can do for you. \n");
+}
+//密文字母频率统计模块
+
+
+//周期置换密码
+int Cycleencrypt(char* plain,char* cipher,char* key);	//周期置换密码加密算法
+int Cycledecrypt(char* plain,char* cipher,char* key);	//周期置换密码解密算法
+void CycleCipherEncrypt();								//周期置换密码加密调用
+void CycleCipherDecrypt();								//周期置换密码解密调用
+void CycleCipher();										//周期置换密码模块调用
+int fix(char* m,int T);									//字符串补齐修正
+
+void CycleCipher()
+{
+	int op=0;
+	while(1)
+	{
+		fflush(stdin);
+		printf("__This_is_Cycle_Cipher_Process_____________________\n");
+		printf("1 for encrypt，2 for decrypt：");
+		scanf("%d",&op);
+		getchar();
+		switch(op)
+		{
+		case 1:{CycleCipherEncrypt();}break;
+		case 2:{CycleCipherDecrypt();}break;
+		default:{printf("Error Input\n");}
+		}
+	}
+}
+//周期置换密码模块调用
+void CycleCipherEncrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE],k[MAXSIZE];
+	//定义变量	
+	printf("Please Input the Plaintext:\n");
+	gets(p);
+	fflush(stdin);
+	printf("Please Input the CycleKey：(连续整数序周期)\n");
+	gets(k);
+	//获取明文&密钥
+	fix(p,strlen(k));
+	//补齐空格
+	Cycleencrypt(p,c,k);
+	//调用加密函数
+	printf("Chipertext:\n%s",c);
+	getchar();
+}
+//周期置换密码加密调用
+void CycleCipherDecrypt()
+{
+	char p[MAXSIZE],c[MAXSIZE],k[MAXSIZE],flag,abc[27];
+	int i,temp;
+	//定义变量	
+	printf("Please Input the Ciphertext:\n");
+	gets(c);
+	printf("Do You Know the Key? y/n:");
+	fflush(stdin);
+	scanf("%c",&flag);
+	getchar();
+
+	switch(flag)
+	{
+	case 'y':	//若知道密钥则直接经行解密
+		{
+			printf("Please Input the CycleKey：\n");
+			gets(k);
+			//获取密钥
+			fix(c,strlen(k));
+			Cycledecrypt(p,c,k);
+			//调用函数
+			printf("Plaintext:\n%s\n",p);
+		}break;
+
+	case 'n':	//不知道密钥则对文本进行字母统计分析
+		{
+			printf("Then I can't help you!\n");
+		};break;
+
+	default:{printf("ERROR\n");}
+	}
+
+}
+//周期置换密码解密调用
+int Cycleencrypt(char* plain,char* cipher,char* key)
+{
+	int i,r,T;
+	i=0;
+
+	T=strlen(key);
+	while(plain[i]!='\0')
+	{
+		r=i%T;
+		cipher[i]=plain[i-r+(key[r]-'0')-1];
+		i++;
+	}
+	cipher[i]='\0';
+	return CRYPT_OK;
+}
+//周期置换密码加密算法
+int Cycledecrypt(char* plain,char* cipher,char* key)
+{
+	int i,r,T;
+	i=0;
+
+	T=strlen(key);
+	while(cipher[i]!='\0')
+	{
+		r=i%T;
+		plain[i]=cipher[i-r+(key[r]-'0')-1];
+		i++;
+	}
+	plain[i]='\0';
+	return CRYPT_OK;
+}
+//周期置换密码解密算法
+int fix(char* m,int T)
+{
+	int i,max;
+	i=strlen(m);
+	if(i%T==0)
+	{return i/T;}
+	else
+	{
+		max=(i/T+1)*T;
+		while(i<max)
+		{
+			m[i]=' ';
+			i++;
+		}
+		m[i]='\0';
+		return max;
+	}
+}
+
